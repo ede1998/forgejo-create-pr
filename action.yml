@@ -87,7 +87,10 @@ runs:
       run: |
         git add ${{ inputs.add-paths }}
         git commit -m "${{ inputs.commit-message }}"
-        git push --force-with-lease origin "${{ inputs.pr-branch }}"
+        prefix="https://${{ inputs.token }}@"
+        remote="$GITHUB_SERVER_URL/$REPO"
+        remote_with_user_token="${remote/#http?(s):\/\//"$prefix"}"        
+        git push --force-with-lease "$remote_with_user_token" "${{ inputs.pr-branch }}"
         echo "URL:  $GITHUB_SERVER_URL/api/v1/repos/$REPO/pulls"
         response=$(curl -X 'POST' \
           "$GITHUB_SERVER_URL/api/v1/repos/$REPO/pulls" \
