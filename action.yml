@@ -42,6 +42,10 @@ inputs:
     description: 'Whether to automatically merge the Pull Request'
     required: false
     default: 'false'
+  pr-automerge-method:
+    description: 'Method to use for auto-merging (merge, rebase, rebase-merge, squash, fast-forward-only, manually-merged)'
+    required: false
+    default: 'merge'
   commit-user:
     description: 'Username to use for commit'
     required: false
@@ -122,20 +126,24 @@ runs:
       env:
         PR_NUMBER: ${{ steps.commit.outputs.pr_number }}
         REPO: ${{ github.repository }}
+        MERGE_METHOD: ${{ inputs.pr-automerge-method }}
       run: |
-          echo "Setting auto merge for PR $PR_NUMBER"
+          echo "Setting auto-merge for PR $PR_NUMBER using method: $MERGE_METHOD"
           echo "URL: $GITHUB_SERVER_URL/api/v1/repos/$REPO/pulls/$PR_NUMBER/merge"
+
           response=$(curl -X 'POST' \
             "$GITHUB_SERVER_URL/api/v1/repos/$REPO/pulls/$PR_NUMBER/merge" \
             -H 'accept: application/json' \
             -H 'Authorization: token ${{ inputs.token }}' \
             -H 'Content-Type: application/json' \
-            -d '{
-            "Do": "merge",
-            "merge_when_checks_succeed": true,
-            "delete_branch_after_merge": true
-            }')
-          echo $response
+            -d "$(jq -n \
+              --arg do "$MERGE_METHOD" \
+              '{
+                "Do": $do,
+                "merge_when_checks_succeed": true,
+                "delete_branch_after_merge": true
+              }')")
+          echo "$response"
 branding:
   icon: 'check'
   color: 'blue'
