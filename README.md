@@ -53,6 +53,10 @@ jobs:
 | `pr-branch` | Branch to create PR against | No | `automated-pr` |
 | `commit-user` | Commit user | No | `Forgejo Bot` |
 | `commit-email` | Commit email | No | `forgejo@users.noreply.git` |
+| `pr-assignee` | Assign PR to user | No | `null` |
+| `pr-automerge` | Automerge PR after all (CI) checks succeeded | No | `false` |
+| `pr-automerge-method` | Merge method to use for the automerge. Any of `merge`, `rebase`, `rebase-merge`, `squash`, `fast-forward-only`, `manually-merged` (option from `Do` field in [API docs](https://codeberg.org/api/swagger#/repository/repoMergePullRequest)). | No | `merge` |
+
 
 
 ## License
